@@ -43,8 +43,8 @@ num = 15
 
 sess=tf.Session()    
 #First let's load meta graph and restore weights
-saver = tf.train.import_meta_graph('cap-model.meta')
-saver.restore(sess,tf.train.latest_checkpoint('./'))
+saver = tf.train.import_meta_graph('user/user-model.meta')
+saver.restore(sess,tf.train.latest_checkpoint('./user'))
 
 
 # Access saved Variables directly
@@ -59,6 +59,8 @@ graph = tf.get_default_graph()
 user_batch = graph.get_tensor_by_name("user_batch:0")
 movie_batch = graph.get_tensor_by_name("movie_batch:0")
 rating_batch = graph.get_tensor_by_name("rating_batch:0")
+genres = pd.read_csv('data/genres.csv')
+W_MOVIE = np.array(genres).astype(np.float32)
 
 feed_dict ={user_batch:train_data[0:num,2],movie_batch:train_data[0:num,0],rating_batch:train_data[0:num,1]}
 
