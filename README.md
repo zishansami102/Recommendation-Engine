@@ -1,6 +1,6 @@
 # Recommendation Engine
 
- A recommendation algorithm implemented with Biased Matrix Factorization(Collaborative Filtering Algorithm) method which is tested over 1 million Movielens Dataset with State-of-the-Art Validation RMSE around ~ 0.83-0.84 and Modified Movielns Dataset during Capillary Technology Data Science Challenge and emerged on 2nd position in recommending 5 movies to 2245 test users.
+ A recommendation algorithm implemented with `Biased Matrix Factorization(Collaborative Filtering Algorithm)` method which is tested over `1 million Movielens Dataset` with State-of-the-Art `Validation RMSE around ~ 0.83-0.84` and Modified Movielns Dataset during Capillary Technology Data Science Challenge and emerged on `2nd position` in recommending 5 movies to 2245 test users.
 
 ![alt text](main.jpg)
 
