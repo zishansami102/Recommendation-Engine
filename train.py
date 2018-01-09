@@ -29,7 +29,7 @@ rating_batch = tf.placeholder(tf.float32, [None], name='rating_batch')
 ##############################################################################################################################
 
 
-def CollabFilterring(user_batch, movie_batch, rating_batch):
+def CollabFilterring(user_batch, movie_batch):
 
 	w_user = tf.Variable(tf.random_normal([NUM_USERS, NUM_FEAT])/np.sqrt(NUM_USERS))
 	w_movie = tf.Variable(tf.random_normal([NUM_MOVIES, NUM_FEAT])/np.sqrt(NUM_MOVIES))
@@ -47,19 +47,22 @@ def CollabFilterring(user_batch, movie_batch, rating_batch):
 	output = tf.add(output, batch_bias_movie)
 	output = tf.add(output, batch_bias_user, name='output')
 
-	cost_l2 = tf.nn.l2_loss(tf.subtract(output, rating_batch))
 	cost_reg = REG_PENALTY*tf.add(tf.nn.l2_loss(batch_w_movie), tf.nn.l2_loss(batch_w_user))
+	
+	return output, cost_reg
+
+def train_nn(user_batch, movie_batch, rating_batch):
+	num_batch_loop = int(NUM_TR_ROW/BATCH_SIZE)
+
+	prediction, cost_reg = CollabFilterring(user_batch, movie_batch)
+	cost_l2 = tf.nn.l2_loss(tf.subtract(prediction, rating_batch))
+	
 	
 	# cost_l2 = tf.reduce_mean(tf.pow(output - rating_batch, 2))
 	# cost_reg = 0
 
 	cost = tf.add(cost_l2, cost_reg)
-	return output, cost
 
-def train_nn(user_batch, movie_batch, rating_batch):
-	num_batch_loop = int(NUM_TR_ROW/BATCH_SIZE)
-
-	prediction, cost = CollabFilterring(user_batch, movie_batch, rating_batch)
 	#default learning rate = 0.001
 	optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(cost)
 	saver = tf.train.Saver()
@@ -100,7 +103,7 @@ def train_nn(user_batch, movie_batch, rating_batch):
 
 		bloss = 0
 		for xx in range(num_batch_loop):
-			pred_batch = prediction.eval({user_batch: test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,0], movie_batch: test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,1], rating_batch: test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,2]})
+			pred_batch = prediction.eval({user_batch: test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,0], movie_batch: test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,1]})
 			pred_batch = np.clip(pred_batch, 1.0, 5.0)
 			bloss += np.mean(np.power(pred_batch - test_data[xx*TS_BATCH_SIZE:(xx+1)*TS_BATCH_SIZE,2], 2))
 			if (xx+1)%50==0:
@@ -108,7 +111,8 @@ def train_nn(user_batch, movie_batch, rating_batch):
 				print(str(per)+"% Completed")
 		test_loss = np.sqrt(bloss/num_batch_loop)
 		print("Test Loss:"+str(round(test_loss,3)))
-		RMSEtr[0]=RMSEts[0]	#this was done to ensure the scale matching in the plot (RMSEtr[0] is around 2.16 and would ruin the plot)
+		
+		RMSEtr[0]=RMSEts[0]	#this was done to ensure the scale matching in the plot (RMSEtr[0] starts from around 2.16 and would ruin the plot)
 		plt.plot(RMSEtr, label='Training Set', color='b')
 		plt.plot(RMSEts, label='Test Set', color='r')
 		plt.legend()
@@ -117,6 +121,7 @@ def train_nn(user_batch, movie_batch, rating_batch):
 		plt.title('RMSE vs Epoch (Biased Matrix Factorization)')
 		plt.show()
 		saver.save(sess, 'gen-model')
+		print("Awesome !!")
 
 
 

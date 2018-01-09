@@ -135,7 +135,7 @@ def train_nn(user_batch, movie_batch, rating_batch):
 df = pd.read_csv('data/training.csv')
 data = np.array(df)
 
-data = np.asfarray(data)	
+data = np.asfarray(data)
 
 index = pd.read_csv('data/train_index.csv')
 userId = data[:,2]

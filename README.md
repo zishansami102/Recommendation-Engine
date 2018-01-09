@@ -50,6 +50,6 @@ python retrain.py
 
 ## Contributing
 
-Contributions are welcome of course ;)
+To start contributing in this repository, create an issue and then start working.
 
 
